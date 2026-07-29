@@ -10,6 +10,7 @@ ingestion:
     - "cond-mat.mtrl-sci"   # Semiconductor Material Science
 
   arxiv_max_results_per_category: 300  
+
   github_topics:
     - "local-llm"
     - "agentic-workflows"
@@ -18,7 +19,7 @@ ingestion:
     - "ai"
     - "embedded-systems"
 
-  min_github_stars: 50
+  min_github_stars: 150
   max_repos_per_topic: 5
   github_pushed_within_days: 3
 
@@ -35,31 +36,35 @@ pre_filter:
     - "low-power"
     - "on-device"
   min_keyword_hits: 1
+
   max_candidates_to_score: 150
+
 
 rate_limiting:
   max_tokens_per_minute: 12000     
-  max_requests_per_minute: 30     
+  max_requests_per_minute: 30      
   max_requests_per_day: 1000       
-  batch_token_budget: 8500        
+  batch_token_budget: 8500         
   sleep_between_batches_seconds: 65
-
 
 agent:
   model_heavy: "llama-3.3-70b-versatile"
-  temperature: 0.0                
+  temperature: 0.0                 
 
   min_passing_score: 8.0           
+
   fuzzy_band_low: 7.0
   fuzzy_band_high: 8.0
   max_deep_dive_items_per_run: 35
 
-  max_total_report_items: 8        
+  max_total_report_items: 8      
 
 audio:
-  enabled: true                  
+  enabled: true                    
   voice_model: "en-US-BrianNeural"
   output_filename: "briefing.mp3"
+
+
 
 delivery:
   smtp_server: "smtp.gmail.com"
@@ -68,5 +73,7 @@ delivery:
   email_subject: "🤖 3-Day Deep-Tech Briefing"
   send_individually: true         
 
+
 state:
   state_file: "last_run.json"
+  min_interval_days: 3

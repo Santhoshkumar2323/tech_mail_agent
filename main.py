@@ -1,4 +1,5 @@
 import yaml
+from datetime import timedelta
 import state
 import ingest_arxiv
 import ingest_github
@@ -14,6 +15,15 @@ def load_config(path: str = "config.yaml") -> dict:
 
 def main():
     config = load_config()
+    min_interval_days = config["state"].get("min_interval_days", 3)
+    elapsed = state.time_since_last_run(config["state"]["state_file"])
+
+    if elapsed is not None and elapsed < timedelta(days=min_interval_days):
+        remaining = timedelta(days=min_interval_days) - elapsed
+        print(f"[main] Only {elapsed} since last run (need {min_interval_days} days). "
+              f"Skipping this trigger — next real run in ~{remaining}.")
+        return
+
     run_state = state.load_state(
         config["state"]["state_file"],
         config["ingestion"]["default_lookback_days"],
@@ -51,9 +61,9 @@ def main():
         state.save_state(config["state"]["state_file"], window_end, sent_ids)
         return
 
+
     for item in candidates:
         item.setdefault("extra_context", "")  
-
     scored = score_agent.score_items(candidates, config)
 
     min_score = config["agent"]["min_passing_score"]
@@ -68,6 +78,7 @@ def main():
         return
 
     narration_script = score_agent.write_narration_script(approved, config)
+
 
     audio_path = None
     if config["audio"]["enabled"]:
