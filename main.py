@@ -14,8 +14,6 @@ def load_config(path: str = "config.yaml") -> dict:
 
 def main():
     config = load_config()
-
-    # --- Step 0: figure out the lookback window + what's already been sent ---
     run_state = state.load_state(
         config["state"]["state_file"],
         config["ingestion"]["default_lookback_days"],
@@ -26,7 +24,6 @@ def main():
 
     print(f"[main] Window: {window_start} -> {window_end}")
 
-    # --- Step 1: ingestion ---
     ing_cfg = config["ingestion"]
     pf_cfg = config["pre_filter"]
 
@@ -54,9 +51,8 @@ def main():
         state.save_state(config["state"]["state_file"], window_end, sent_ids)
         return
 
-    # --- Step 2: scoring + writing ---
     for item in candidates:
-        item.setdefault("extra_context", "")  # deep-dive context fetch could be added here later
+        item.setdefault("extra_context", "")  
 
     scored = score_agent.score_items(candidates, config)
 
@@ -73,15 +69,14 @@ def main():
 
     narration_script = score_agent.write_narration_script(approved, config)
 
-    # --- Step 3: audio (best-effort) ---
     audio_path = None
     if config["audio"]["enabled"]:
         audio_path = audio_gen.generate_narration_audio(
             narration_script, config["audio"]["voice_model"], config["audio"]["output_filename"]
         )
 
-    # --- Step 4: email ---
     html_body = send_email.build_html_report(approved)
+    plain_body = send_email.build_plain_text_report(approved)
     recipients = send_email.get_recipients_from_env()
 
     if not recipients:
@@ -92,12 +87,12 @@ def main():
             subject=config["delivery"]["email_subject"],
             sender_name=config["delivery"]["sender_name"],
             html_body=html_body,
+            plain_body=plain_body,
             audio_path=audio_path,
             smtp_server=config["delivery"]["smtp_server"],
             smtp_port=config["delivery"]["smtp_port"],
         )
 
-    # --- Step 5: save state ---
     for item in approved:
         sent_ids.add(state.make_item_id(item["source"], item["id"]))
     state.save_state(config["state"]["state_file"], window_end, sent_ids)

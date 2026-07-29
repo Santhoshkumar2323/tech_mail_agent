@@ -2,11 +2,21 @@ ingestion:
   default_lookback_days: 3
 
   arxiv_categories:
+    - "cs.AI"              # Artificial Intelligence
     - "cs.LG"              # Machine Learning
+    - "cs.RO"               # Robotics
+    - "q-bio.BM"            # BioTech (Biomolecules)
+    - "cond-mat.mes-hall"   # NanoTech (Mesoscale/Nanoscale Physics)
+    - "cond-mat.mtrl-sci"   # Semiconductor Material Science
 
   arxiv_max_results_per_category: 300  
   github_topics:
+    - "local-llm"
+    - "agentic-workflows"
+    - "ros2"
+    - "ml"
     - "ai"
+    - "embedded-systems"
 
   min_github_stars: 50
   max_repos_per_topic: 5
@@ -25,7 +35,7 @@ pre_filter:
     - "low-power"
     - "on-device"
   min_keyword_hits: 1
-  max_candidates_to_score: 10
+  max_candidates_to_score: 150
 
 rate_limiting:
   max_tokens_per_minute: 12000     
@@ -42,7 +52,7 @@ agent:
   min_passing_score: 8.0           
   fuzzy_band_low: 7.0
   fuzzy_band_high: 8.0
-  max_deep_dive_items_per_run: 5
+  max_deep_dive_items_per_run: 35
 
   max_total_report_items: 8        
 

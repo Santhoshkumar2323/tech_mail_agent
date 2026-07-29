@@ -4,15 +4,6 @@ from datetime import datetime, timedelta, timezone
 
 
 def load_state(state_file: str, default_lookback_days: int) -> dict:
-    """
-    Loads last_run.json if it exists. If not (first-ever run), falls back
-    to a default lookback window.
-
-    Returns a dict with:
-      - window_start: datetime to fetch items FROM
-      - window_end: datetime to fetch items UP TO (now)
-      - sent_ids: set of item IDs already sent in previous runs (for dedup)
-    """
     now = datetime.now(timezone.utc)
 
     if not os.path.exists(state_file):
@@ -35,11 +26,6 @@ def load_state(state_file: str, default_lookback_days: int) -> dict:
 
 
 def save_state(state_file: str, window_end: datetime, sent_ids: set, keep_last_n: int = 500) -> None:
-    """
-    Writes the new state after a successful run.
-    Keeps only the most recent `keep_last_n` sent_ids to stop the file
-    from growing unbounded over time.
-    """
     trimmed_ids = list(sent_ids)[-keep_last_n:]
 
     data = {
@@ -52,7 +38,4 @@ def save_state(state_file: str, window_end: datetime, sent_ids: set, keep_last_n
 
 
 def make_item_id(source: str, identifier: str) -> str:
-    """
-    Builds a consistent dedup key, e.g. 'arxiv:2507.12345' or 'github:owner/repo'.
-    """
     return f"{source}:{identifier}"

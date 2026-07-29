@@ -1,22 +1,3 @@
-"""
-score_agent.py
-Module 2 — The agentic scoring engine, built as a LangGraph.
-
-Per item flow:
-  1. initial_score   -> every candidate gets scored on title+abstract/description
-  2. deep_dive        -> ONLY if score lands in the fuzzy band (config: fuzzy_band_low/high),
-                          AND we're still under max_deep_dive_items_per_run for this run.
-                          Re-scores with more context (fuller text / README).
-  3. critique         -> runs right after deep_dive, sanity-checks the new score
-                          against the rubric anchors, may nudge it slightly.
-
-Once every item has a final score, approved items (>= min_passing_score) go
-through a single run-once writer step that turns them into a narration script.
-
-Every LLM call in this file counts against the Groq free-tier budget
-(12k TPM / 30 RPM / 1000 RPD) — see rate_limiting section in config.yaml.
-"""
-
 import os
 import time
 from typing import TypedDict, Optional
@@ -46,8 +27,8 @@ class ItemState(TypedDict):
     source: str
     id: str
     title: str
-    text: str          # abstract or description used for scoring
-    extra_context: str  # fuller text used only in deep_dive
+    text: str          
+    extra_context: str  
     score: float
     reasoning: str
     went_deep_dive: bool

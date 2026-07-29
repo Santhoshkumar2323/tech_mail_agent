@@ -1,15 +1,3 @@
-"""
-ingest_github.py
-Module 1b — Pulls trending repos from GitHub for each configured topic.
-
-Key fix from the original design: filters on `pushed:>` (recent activity)
-combined with a star threshold, NOT `created:>` (repo age). A repo created
-a year ago that just started trending is what we actually want — a repo
-literally created in the last 3 days almost never has 50+ stars yet.
-
-Requires a GitHub token (env var GITHUB_TOKEN) for a higher search rate limit.
-"""
-
 import os
 import requests
 import time
@@ -19,9 +7,6 @@ GITHUB_SEARCH_URL = "https://api.github.com/search/repositories"
 
 
 def fetch_github_topic(topic: str, min_stars: int, pushed_since: datetime, max_results: int) -> list[dict]:
-    """
-    Fetches repos for a single topic: recently pushed AND above the star threshold.
-    """
     token = os.environ.get("GITHUB_TOKEN", "")
     headers = {"Authorization": f"token {token}"} if token else {}
 
@@ -57,10 +42,6 @@ def fetch_github_topic(topic: str, min_stars: int, pushed_since: datetime, max_r
 
 
 def fetch_all_github(topics: list[str], min_stars: int, pushed_since: datetime, max_per_topic: int) -> list[dict]:
-    """
-    Fetches repos across all topics, then dedups by full repo name
-    (a repo can legitimately match more than one topic).
-    """
     all_repos = []
     seen_names = set()
 
@@ -70,15 +51,11 @@ def fetch_all_github(topics: list[str], min_stars: int, pushed_since: datetime, 
             if repo["id"] not in seen_names:
                 seen_names.add(repo["id"])
                 all_repos.append(repo)
-        time.sleep(2)  # stay well under the search API rate limit
-
+        time.sleep(2) 
     return all_repos
 
 
 def apply_keyword_prefilter(repos: list[dict], keywords: list[str], min_hits: int, max_candidates: int) -> list[dict]:
-    """
-    Same pre-filter logic as arXiv, applied to repo name + description.
-    """
     scored = []
     for repo in repos:
         text = (repo["title"] + " " + repo["abstract"]).lower()
