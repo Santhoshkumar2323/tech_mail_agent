@@ -6,6 +6,10 @@ Everything runs for free using GitHub Actions, Groq, and Gmail.
 
 ---
 
+## Architecture
+![Architecture Diagram](./architecture/how_it_works.svg)
+
+
 ## How it works 
 
 1. **Check if it's actually time to run.** The trigger might fire every day, but this bot is only supposed to send every 3 days. So first it checks the last run time. If it's too soon, it stops here and does nothing.
